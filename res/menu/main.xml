@@ -5,7 +5,8 @@
     
 	<item android:id="@+id/item1" 
 	    android:showAsAction="ifRoom"
-	    android:title="@string/item1" />
+	    android:title="@string/item1"
+	    android:icon="@drawable/resett" />
 	
 	<item android:id="@+id/item2" 
 	    android:showAsAction="ifRoom"
