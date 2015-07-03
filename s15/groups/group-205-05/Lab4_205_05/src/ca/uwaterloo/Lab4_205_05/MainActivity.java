@@ -1,9 +1,12 @@
 package ca.uwaterloo.Lab4_205_05;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.graphics.PointF;
 import android.hardware.Sensor;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
@@ -26,6 +29,11 @@ public class MainActivity extends Activity {
 	 public static int steps = 0;
 	 public static MapView  mv;
 	 public static float[] gravity;
+	 List<PointF> pointList = new ArrayList<PointF>();
+	 List<InterceptPoint> interceptPoint = new ArrayList<InterceptPoint>(); 
+	 static PointF startPoint;
+	 static PointF endPoint;
+	 static PointF userPoint;
 	 
     /* public void onClick(View v) { }
      	public void btnClick(View V){
@@ -60,6 +68,24 @@ public class MainActivity extends Activity {
     		}
     		catch(RuntimeException e){
     		}
+    		
+    		mv.addListener(new PositionListener(){
+
+				@Override
+				public void originChanged(MapView source, PointF loc) {
+					startPoint = loc;
+					mv.setUserPoint(loc);
+					
+				}
+
+				@Override
+				public void destinationChanged(MapView source, PointF dest) {
+					// TODO Auto-generated method stub
+					
+				}
+    			
+    		});
+    		
         }
     }
 

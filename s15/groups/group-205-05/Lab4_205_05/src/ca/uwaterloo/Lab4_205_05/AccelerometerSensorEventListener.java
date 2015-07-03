@@ -10,12 +10,12 @@ class AccelerometerSensorEventListener implements SensorEventListener {
 	public static float rotVal1;
 	float x,y,z,previous;
 	TextView output;
-	float[] maxAcc, minAcc = new float[3];
+	//float[] maxAcc, minAcc = new float[3];
 	float[] outputA = new float[3];
 	double C = 6.0;
 	int state = 0; 
-	String[] num;
-	String maxValues, minValues;
+	//String[] num;
+	//String maxValues, minValues;
 	public static boolean stepTrue = false;
 	
 	public AccelerometerSensorEventListener(TextView outputText){
