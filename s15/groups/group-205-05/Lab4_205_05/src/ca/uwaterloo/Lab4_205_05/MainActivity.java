@@ -11,6 +11,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Gravity;
@@ -27,24 +28,25 @@ import android.widget.Toast;
 public class MainActivity extends Activity {
 	 static LineGraphView graph;
 	 public static int steps = 0;
-	 public static MapView  mv;
+	 static MapView  mv;
 	 public static float[] gravity;
-	 List<PointF> pointList = new ArrayList<PointF>();
+	 List<PointF> pathPoints = new ArrayList<PointF>();
 	 List<InterceptPoint> interceptPoint = new ArrayList<InterceptPoint>(); 
 	 static PointF startPoint;
 	 static PointF endPoint;
-	 static PointF userPoint;
+	 static PointF userP;
 	 
-    /* public void onClick(View v) { }
+	 
+     public void onClick(View v) { }
      	public void btnClick(View V){
-     		steps = 0;
+     		steps += 1;
+     		AccelerometerSensorEventListener.stepTrue = true;
      	}
- 	public void btnClick1(View v){
+     	
+ 	/*public void btnClick1(View v){
  		MagnetoSensorEventListener.eastSteps = 0;
- 		MagnetoSensorEventListener.northSteps = 0;
- 		MagnetoSensorEventListener.netDis = 0;
- 		MagnetoSensorEventListener.netDir = 0;
      	}*/
+     	
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,41 +57,48 @@ public class MainActivity extends Activity {
                 .add(R.id.container, new PlaceholderFragment())
                 .commit();  
     		
-    		
     		graph = new LineGraphView(getApplicationContext(), 100, Arrays.asList("x", "y", "z"));
     		graph.setVisibility(View.VISIBLE);
     		
-    		try{	        			
+    			        			
         		mv = new  MapView(getApplicationContext(), 1200, 800, 35, 35);
         		registerForContextMenu(mv);
-                NavigationalMap map = MapLoader.loadMap(getExternalFilesDir(null),"E2-3344.svg");
+        		final NavigationalMap map = MapLoader.loadMap(getExternalFilesDir(null),"E2-3344.svg");
         		
         		mv.setMap(map);
-    		}
-    		catch(RuntimeException e){
-    		}
-    		
-    		mv.addListener(new PositionListener(){
+        		mv.addListener(new PositionListener(){
 
 				@Override
 				public void originChanged(MapView source, PointF loc) {
-					startPoint = loc;
-					mv.setUserPoint(loc);
+					//mv.setUserPoint(loc);
+					userP = loc;
+					startPoint = loc; //assign a start point to be referenced within our code
+					pathPoints.add(loc);
 					
 				}
 
 				@Override
 				public void destinationChanged(MapView source, PointF dest) {
-					// TODO Auto-generated method stub
+					endPoint = dest;
 					
+					interceptPoint = map.calculateIntersections(startPoint, endPoint);
+					
+					for(int g= 0; g < interceptPoint.size();g++){
+						Log.e("points", String.valueOf(interceptPoint.get(g).getLine().end.x) + "," + String.valueOf(interceptPoint.get(g).getLine().end.y));
+					}
+					
+					
+					pathPoints.add(endPoint);
+					mv.setUserPath(pathPoints);
 				}
     			
     		});
-    		
         }
     }
 
-
+	//the method updateUserPoint updates the user's current position
+	
+	
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo){
 		super.onCreateContextMenu(menu, v, menuInfo);
@@ -124,7 +133,7 @@ public class MainActivity extends Activity {
 	 		MagnetoSensorEventListener.northSteps = 0;
 	 		MagnetoSensorEventListener.netDis = 0;
 	 		MagnetoSensorEventListener.netDir = 0;
-	 		Toast.makeText(this, "Direction Steps reset to zero", Toast.LENGTH_LONG).show();
+	 		Toast.makeText(this, "Direction Steps reset to zero", Toast.LENGTH_SHORT).show();
         }
 		return true;
     }
@@ -173,7 +182,7 @@ public class MainActivity extends Activity {
         	
         	layout.addView(mv);
         	
-        	layout.addView(graph);
+        	//layout.addView(graph);
         	valueC = (SeekBar) rootView.findViewById(R.id.seekBar1);
             valueC.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
     			
