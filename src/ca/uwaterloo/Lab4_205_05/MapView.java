@@ -38,13 +38,6 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 
-/**
- * Mapper class for getting user input relative to an SVG map loaded by the MapLoader.
- * 
- * The Mapper's coordinate origin is in the top left hand corner.
- * @author Kirill Morozov
- *
- */
 public class MapView extends View
 {
     private float fieldWidth = 400;

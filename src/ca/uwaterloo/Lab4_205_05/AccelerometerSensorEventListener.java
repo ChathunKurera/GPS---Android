@@ -22,6 +22,7 @@ class AccelerometerSensorEventListener implements SensorEventListener {
 		output = outputText;		
 		}		
 
+	
 		public void onAccuracyChanged(Sensor s, int i){}
 		
 		public void onSensorChanged(SensorEvent se){

@@ -8,14 +8,6 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.view.View;
 
-/**
- * A simple implementation of a line graph widget.
- * The x axis is not user configurable, but it assumes each sample is 
- * happening at a constant frequency.
- * 
- * @author Kirill 
- *
- */
 public class LineGraphView extends View
 {
 	private List<float[]> points = new ArrayList<float[]>();

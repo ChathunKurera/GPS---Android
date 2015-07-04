@@ -1,7 +1,5 @@
 package ca.uwaterloo.Lab4_205_05;
 
-import ca.uwaterloo.Lab4_205_05.AccelerometerSensorEventListener;
-import ca.uwaterloo.Lab4_205_05.MainActivity;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -21,13 +19,13 @@ class MagnetoSensorEventListener implements SensorEventListener {
 	float[] angleReading = new float[2];
 	public static double northSteps, eastSteps, netDis, netDir = 0;
 	double error;
+	double addedXdirection;
+	double addedYdirection;
 	
 	public MagnetoSensorEventListener(TextView outputText, TextView stepsInNE){
 		output = outputText;
 		stepView = stepsInNE;
 	}
-	
-	
 	
 		public void onAccuracyChanged(Sensor s, int i){}
 		
@@ -57,16 +55,21 @@ class MagnetoSensorEventListener implements SensorEventListener {
 						else{
 							properAngle = 360 - angle;
 						}
+						
 						if(AccelerometerSensorEventListener.stepTrue){
 							northSteps += 0.8*Math.cos((properAngle*3.1415926f/180));
 							eastSteps += 0.8*Math.sin((properAngle*3.1415926f/180));
+
+							if(MainActivity.startPoint != null){
+								addedXdirection = (double) 0.8*Math.sin(angleReading[0]);
+								addedYdirection = (double) 0.8*Math.cos(angleReading[0]);
+								updateUserPoint(addedXdirection, addedYdirection);
+								MainActivity.mv.setUserPoint(MainActivity.userP);								
+							}
 							
-							AccelerometerSensorEventListener.stepTrue = false;
-						}
-								 		
+							AccelerometerSensorEventListener.stepTrue = false;							
+						}	 		
 						netDis = Math.sqrt(Math.pow(northSteps, 2)+ Math.pow(eastSteps, 2));
-						netDir = (Math.atan(eastSteps/northSteps))*180/3.1415926f;
-						
 						error = netDis/MainActivity.steps *100;
 						
 						output.setTextSize(30);
@@ -75,7 +78,15 @@ class MagnetoSensorEventListener implements SensorEventListener {
 								+ "\nNet Displacement: " + String.format("%.2f", netDis) + " (" + String.format("%.2f", netDir) + ")"  + "\nError " 
 								+ String.format("%.2f", error)+"%");
 					}
+					
+					
+					
 				}
 			}
 		}
+		
+		public static void updateUserPoint(double addedX, double addedY){
+			MainActivity.userP.x = (float) addedX + MainActivity.userP.x;
+			MainActivity.userP.y = (float) addedY + MainActivity.userP.y;
+	    }
 }
