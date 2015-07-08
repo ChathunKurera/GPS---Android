@@ -32,20 +32,19 @@ public class MainActivity extends Activity {
 	 public static float[] gravity;
 	 List<PointF> pathPoints = new ArrayList<PointF>();
 	 List<InterceptPoint> interceptPoint = new ArrayList<InterceptPoint>(); 
-	 static PointF startPoint;
-	 static PointF endPoint;
+	 static PointF startPoint, endPoint;
 	 static PointF userP;
-	 PointF issaraha;
-	 PointF passe;
+	 PointF closestToS, closestToE;
+	 PointF eye, jay;
+	 PointF[] mapPoint = new PointF[3];
 	 
-	 PointF one = new PointF(5.3455f, 8.9702f);
-	 PointF two = new PointF(7.9432f,18.0924f);
-	 PointF three = new PointF(3.8618f, 18.2654f);
-	 PointF four = new PointF(17.1149f, 2.0287f);
-	 PointF five = new PointF(12.1469f, 12.6489f);
-	 PointF six = new PointF(22.2383f, 6.3163f);
-	 PointF seven = new PointF(19.0857f, 18.3551f);
-	 PointF eight = new PointF(20.6143f, 19.0413f);
+//	 PointF two = new PointF(7.8132f,18.0924f);
+//	 PointF three = new PointF(3.8618f, 18.2654f);
+//	 PointF four = new PointF(17.1149f, 2.0287f);
+//	 PointF five = new PointF(12.8469f, 17.6489f);
+//	 PointF six = new PointF(22.2383f, 6.3163f);
+//	 PointF seven = new PointF(19.0857f, 18.3551f);
+//	 PointF eight = new PointF(20.6143f, 19.0413f);
 	 
 	 
      public void onClick(View v) { }
@@ -54,10 +53,6 @@ public class MainActivity extends Activity {
      		AccelerometerSensorEventListener.stepTrue = true;
      		Log.e("hehe", String.valueOf(userP));
      	}
-     	
- 	/*public void btnClick1(View v){
- 		MagnetoSensorEventListener.eastSteps = 0;
-     	}*/
      	
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,43 +66,60 @@ public class MainActivity extends Activity {
     		
 	    		graph = new LineGraphView(getApplicationContext(), 100, Arrays.asList("x", "y", "z"));
 	    		graph.setVisibility(View.VISIBLE);
-    	        			
         		mv = new  MapView(getApplicationContext(), 1200, 800, 35, 35);
         		registerForContextMenu(mv);
         		final NavigationalMap map = MapLoader.loadMap(getExternalFilesDir(null),"E2-3344.svg");
         		
+        		mapPoint[0] = new PointF(3.8618f, 18.2654f);        		
+        		mapPoint[1] = new PointF(12.8469f, 18.2654f);
+        		mapPoint[2] = new PointF(20.6143f, 18.2654f);
+        		
         		mv.setMap(map);
+        		
         		mv.addListener(new PositionListener(){
 
 				@Override
 				public void originChanged(MapView source, PointF loc) {
-					userP = loc;
 					startPoint = loc; //assign a start point to be referenced within our code
+					userP = loc;
 					pathPoints.add(loc);
-					
 				}
 
 				@Override
 				public void destinationChanged(MapView source, PointF dest) {
+					
 					endPoint = dest;
-					mv.setUserPoint(userP);
 					interceptPoint = map.calculateIntersections(startPoint, endPoint);
+					mv.setUserPoint(userP);
 					
-					issaraha = one;
-					
-					for( int i = 0; i<8; i++){
-						if(i==0) ;
+					for( int i = 0; i<3; i++){
+						eye = mapPoint[i];
+						double deltaX = Math.abs(eye.x - startPoint.x);
+						double deltaY = Math.abs(eye.y - startPoint.y);
+						
+						if(map.calculateIntersections(eye, startPoint).isEmpty() && 
+									Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2)) <= 50f){
+								closestToS = eye;
+						}
 					}
-					
-					
-					
-					
-					for(int g= 0; g < interceptPoint.size();g++){
-						Log.e("points", String.valueOf(interceptPoint.get(g).getLine().end.x) + "," 
-									+ String.valueOf(interceptPoint.get(g).getLine().end.y));
+					pathPoints.add(closestToS);
+										
+					for( int j = 0; j<3; j++){
+						jay = mapPoint[j];						
+						double deltaX = Math.abs(jay.x - endPoint.x);
+						double deltaY = Math.abs(jay.y - endPoint.y);
+						
+						if(map.calculateIntersections(jay, endPoint).isEmpty() &&
+									Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2)) <= 1000f){
+								closestToE = jay;
+						}				
 					}
+					pathPoints.add(closestToE);
 					
-					
+//					for(int g= 0; g < interceptPoint.size();g++){
+//						Log.e("pointnns", String.valueOf(interceptPoint.get(g).getLine().end.x) + "," 
+//									+ String.valueOf(interceptPoint.get(g).getLine().end.y));
+//					}
 					pathPoints.add(endPoint);
 					mv.setUserPath(pathPoints);
 				}
@@ -116,7 +128,6 @@ public class MainActivity extends Activity {
         }
     }
 
-	//the method updateUserPoint updates the user's current position
 	
 	
 	@Override
