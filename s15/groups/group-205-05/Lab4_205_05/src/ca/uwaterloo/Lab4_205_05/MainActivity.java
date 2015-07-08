@@ -35,12 +35,24 @@ public class MainActivity extends Activity {
 	 static PointF startPoint;
 	 static PointF endPoint;
 	 static PointF userP;
+	 PointF issaraha;
+	 PointF passe;
+	 
+	 PointF one = new PointF(5.3455f, 8.9702f);
+	 PointF two = new PointF(7.9432f,18.0924f);
+	 PointF three = new PointF(3.8618f, 18.2654f);
+	 PointF four = new PointF(17.1149f, 2.0287f);
+	 PointF five = new PointF(12.1469f, 12.6489f);
+	 PointF six = new PointF(22.2383f, 6.3163f);
+	 PointF seven = new PointF(19.0857f, 18.3551f);
+	 PointF eight = new PointF(20.6143f, 19.0413f);
 	 
 	 
      public void onClick(View v) { }
      	public void btnClick(View V){
      		steps += 1;
      		AccelerometerSensorEventListener.stepTrue = true;
+     		Log.e("hehe", String.valueOf(userP));
      	}
      	
  	/*public void btnClick1(View v){
@@ -57,10 +69,9 @@ public class MainActivity extends Activity {
                 .add(R.id.container, new PlaceholderFragment())
                 .commit();  
     		
-    		graph = new LineGraphView(getApplicationContext(), 100, Arrays.asList("x", "y", "z"));
-    		graph.setVisibility(View.VISIBLE);
-    		
-    			        			
+	    		graph = new LineGraphView(getApplicationContext(), 100, Arrays.asList("x", "y", "z"));
+	    		graph.setVisibility(View.VISIBLE);
+    	        			
         		mv = new  MapView(getApplicationContext(), 1200, 800, 35, 35);
         		registerForContextMenu(mv);
         		final NavigationalMap map = MapLoader.loadMap(getExternalFilesDir(null),"E2-3344.svg");
@@ -70,7 +81,6 @@ public class MainActivity extends Activity {
 
 				@Override
 				public void originChanged(MapView source, PointF loc) {
-					//mv.setUserPoint(loc);
 					userP = loc;
 					startPoint = loc; //assign a start point to be referenced within our code
 					pathPoints.add(loc);
@@ -80,11 +90,21 @@ public class MainActivity extends Activity {
 				@Override
 				public void destinationChanged(MapView source, PointF dest) {
 					endPoint = dest;
-					
+					mv.setUserPoint(userP);
 					interceptPoint = map.calculateIntersections(startPoint, endPoint);
 					
+					issaraha = one;
+					
+					for( int i = 0; i<8; i++){
+						if(i==0) ;
+					}
+					
+					
+					
+					
 					for(int g= 0; g < interceptPoint.size();g++){
-						Log.e("points", String.valueOf(interceptPoint.get(g).getLine().end.x) + "," + String.valueOf(interceptPoint.get(g).getLine().end.y));
+						Log.e("points", String.valueOf(interceptPoint.get(g).getLine().end.x) + "," 
+									+ String.valueOf(interceptPoint.get(g).getLine().end.y));
 					}
 					
 					
@@ -105,7 +125,6 @@ public class MainActivity extends Activity {
 		mv.onCreateContextMenu(menu,v,menuInfo);
 	}
 	
-
 	@Override
 	public boolean onContextItemSelected(MenuItem item){
 		return super.onContextItemSelected(item)|| mv.onContextItemSelected(item);
@@ -113,16 +132,12 @@ public class MainActivity extends Activity {
 	
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.item1) {
         	steps = 0;
