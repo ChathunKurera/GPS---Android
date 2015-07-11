@@ -36,22 +36,20 @@ public class MainActivity extends Activity {
 	 static PointF userP;
 	 PointF closestToS, closestToE;
 	 PointF eye, jay;
-	 PointF[] mapPoint = new PointF[3];
-	 
-//	 PointF two = new PointF(7.8132f,18.0924f);
-//	 PointF three = new PointF(3.8618f, 18.2654f);
-//	 PointF four = new PointF(17.1149f, 2.0287f);
-//	 PointF five = new PointF(12.8469f, 17.6489f);
-//	 PointF six = new PointF(22.2383f, 6.3163f);
-//	 PointF seven = new PointF(19.0857f, 18.3551f);
-//	 PointF eight = new PointF(20.6143f, 19.0413f);
-	 
+	 PointF[] mapE2 = new PointF[3];
+	 double sTocloseS;
+	 double sTocloseE;
+	 String firstTurn;
+	 String secondTurn;
+	 public static TextView turnDir;
+	 double angle;
+	 double angle2;
 	 
      public void onClick(View v) { }
      	public void btnClick(View V){
      		steps += 1;
      		AccelerometerSensorEventListener.stepTrue = true;
-     		Log.e("hehe", String.valueOf(userP));
+     		Log.e("userPoint", String.valueOf(userP));
      	}
      	
 	@Override
@@ -70,52 +68,91 @@ public class MainActivity extends Activity {
         		registerForContextMenu(mv);
         		final NavigationalMap map = MapLoader.loadMap(getExternalFilesDir(null),"E2-3344.svg");
         		
-        		mapPoint[0] = new PointF(3.8618f, 18.2654f);        		
-        		mapPoint[1] = new PointF(12.8469f, 18.2654f);
-        		mapPoint[2] = new PointF(20.6143f, 18.2654f);
+        		mapE2[0] = new PointF(3.8618f, 18.2654f);        		
+        		mapE2[1] = new PointF(12.8469f, 18.2654f);
+        		mapE2[2] = new PointF(20.6143f, 18.2654f);
+        		//mapE2[3] = new PointF(21.3685f, 6.6246f);
         		
         		mv.setMap(map);
-        		
         		mv.addListener(new PositionListener(){
-
-				@Override
-				public void originChanged(MapView source, PointF loc) {
-					startPoint = loc; //assign a start point to be referenced within our code
-					userP = loc;
-					pathPoints.add(loc);
-				}
-
-				@Override
-				public void destinationChanged(MapView source, PointF dest) {
+					@Override
+					public void originChanged(MapView source, PointF loc) {
+						startPoint = loc; //assign a start point to be referenced within our code
+						userP = loc;
+						pathPoints.add(loc);
+					}
+	
+					@Override
+					public void destinationChanged(MapView source, PointF dest) {
 					
 					endPoint = dest;
-					interceptPoint = map.calculateIntersections(startPoint, endPoint);
 					mv.setUserPoint(userP);
 					
-					for( int i = 0; i<3; i++){
-						eye = mapPoint[i];
-						double deltaX = Math.abs(eye.x - startPoint.x);
-						double deltaY = Math.abs(eye.y - startPoint.y);
-						
-						if(map.calculateIntersections(eye, startPoint).isEmpty() && 
-									Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2)) <= 50f){
-								closestToS = eye;
+					//finding the closest point to startPoint
+					if(map.calculateIntersections(startPoint, endPoint).size() != 0){
+						for( int i = 0; i<3; i++){
+							eye = mapE2[i];
+							double deltaX = Math.abs(eye.x - startPoint.x);
+							double deltaY = Math.abs(eye.y - startPoint.y);
+							
+							if(map.calculateIntersections(eye, startPoint).isEmpty() && 
+										Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2)) <= 50f){
+									closestToS = eye;
+							}
 						}
-					}
-					pathPoints.add(closestToS);
-										
-					for( int j = 0; j<3; j++){
-						jay = mapPoint[j];						
-						double deltaX = Math.abs(jay.x - endPoint.x);
-						double deltaY = Math.abs(jay.y - endPoint.y);
+						pathPoints.add(closestToS);
+						//if(closestToS == mapE2[3]){pathPoints.add(mapE2[2]);}
 						
-						if(map.calculateIntersections(jay, endPoint).isEmpty() &&
-									Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2)) <= 1000f){
-								closestToE = jay;
-						}				
+						
+						//finding the closest point to endPoint
+						for( int j = 0; j<3; j++){
+							jay = mapE2[j];						
+							double deltaX = Math.abs(jay.x - endPoint.x);
+							double deltaY = Math.abs(jay.y - endPoint.y);
+							
+							if(map.calculateIntersections(jay, endPoint).isEmpty() &&
+										Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2)) <= 1000f){
+									closestToE = jay;
+							}	
+						}
+						//if(closestToE == mapE2[3] && endPoint.y>closestToE.y){pathPoints.add(mapE2[2]);}
+						pathPoints.add(closestToE);
+						
+
+						double xOf_sTcS = -(startPoint.x - closestToS.x);
+						double yOf_sTcS = -(startPoint.y - closestToS.y);
+						double xOf_eTcE = endPoint.x - closestToE.x;
+						double yOf_eTcE = endPoint.y - closestToE.y;
+						//if(closestToS != closestToE){
+/*distance btwn startpt and closestToS*/	sTocloseS = Math.sqrt(Math.pow(Math.abs(xOf_sTcS), 2) + Math.pow(Math.abs(yOf_sTcS), 2));
+/*distance btween endpt and closestToE*/	sTocloseE = Math.sqrt(Math.pow(Math.abs(xOf_eTcE), 2) + Math.pow(Math.abs(yOf_eTcE), 2)); 
+							
+							if((startPoint.x<endPoint.x && startPoint.y <= closestToS.y) || startPoint.x>endPoint.x && startPoint.y > closestToS.y){
+								firstTurn = "LEFT";
+								angle = 180-((Math.atan2((double)yOf_sTcS, (double)xOf_sTcS))*180/3.1415926);
+							}
+							else if((startPoint.x>endPoint.x && startPoint.y <= closestToS.y) || startPoint.x<endPoint.x && startPoint.y > closestToS.y){
+								firstTurn = "RIGHT";
+								angle = 180+((Math.atan2((double)yOf_sTcS, (double)xOf_sTcS))*180/3.1415926);
+								if(angle>180) angle = angle - 180;
+							}
+							
+							if((closestToE.y>endPoint.y && closestToS.x < closestToE.x) || closestToE.y<endPoint.y && closestToS.x > closestToE.x){
+								secondTurn = "LEFT";
+								angle2 = ((Math.atan2((double)yOf_eTcE, (double)xOf_eTcE))*180/3.1415926);
+								if(angle2<0) angle2 = 180 + angle2;
+							}
+							else if((closestToE.y<endPoint.y && closestToS.x < closestToE.x) || closestToE.y>endPoint.y && closestToS.x > closestToE.x){
+								secondTurn = "RIGHT";
+								angle2 = ((Math.atan2((double)-yOf_eTcE, (double)xOf_eTcE))*180/3.1415926);
+								if(angle2<0) angle2 = 180 + angle2;
+							}
+							
+					//	}
+
+						turnDir.setText("Go straight and turn " + firstTurn + " at " + String.format("%.2f", angle) 
+								+ " then go straight and turn " + secondTurn + " at " + String.format("%.2f", angle2));
 					}
-					pathPoints.add(closestToE);
-					
 //					for(int g= 0; g < interceptPoint.size();g++){
 //						Log.e("pointnns", String.valueOf(interceptPoint.get(g).getLine().end.x) + "," 
 //									+ String.valueOf(interceptPoint.get(g).getLine().end.y));
@@ -161,6 +198,13 @@ public class MainActivity extends Activity {
 	 		MagnetoSensorEventListener.netDir = 0;
 	 		Toast.makeText(this, "Direction Steps reset to zero", Toast.LENGTH_SHORT).show();
         }
+        if (id == R.id.item3) {
+        	pathPoints.clear(); 
+     		interceptPoint.clear();
+     		startPoint = null;
+     		endPoint = null;
+        	Toast.makeText(this, "GPS path cleared", Toast.LENGTH_SHORT).show();
+        }
 		return true;
     }
 
@@ -184,6 +228,7 @@ public class MainActivity extends Activity {
             TextView accelLabel = new TextView(rootView.getContext());
             TextView rotatLabel = new TextView(rootView.getContext());
             TextView magntLabel = new TextView(rootView.getContext());
+            turnDir = new TextView(rootView.getContext());
             
             SensorManager sensorManager = (SensorManager) rootView.getContext().getSystemService(SENSOR_SERVICE);
             
@@ -205,6 +250,9 @@ public class MainActivity extends Activity {
         	SensorEventListener r = new RotationalSensorEventListener(rotatLabel);
         	sensorManager.registerListener(r, rotation, SensorManager.SENSOR_DELAY_NORMAL);
         	layout.addView(rotatLabel);
+        	
+        	turnDir.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
+        	layout.addView(turnDir);
         	
         	layout.addView(mv);
         	

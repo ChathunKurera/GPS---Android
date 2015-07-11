@@ -5,8 +5,8 @@
     <string name="layout_Main">Main_Layout</string>
     <string name="action_settings">Settings</string>
     <string name="reset">Add step</string>
-    <string name="dirReset">Reset Direction Counter</string>
     <string name="item1">Reset Steps</string>
     <string name="item2">Reset Direction Steps</string>
+    <string name="item3">Reset GPS</string>
 
 </resources>

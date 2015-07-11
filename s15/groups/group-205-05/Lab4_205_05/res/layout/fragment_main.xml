@@ -30,15 +30,7 @@
 		    android:layout_gravity="center"
 		    android:onClick="btnClick"
 		    android:text="@string/reset" />
-<!--
-		<Button
-		    android:id="@+id/btnDirReset"
-		    android:layout_width="170dp"
-		    android:layout_height="wrap_content"
-		    android:layout_gravity="center"
-		    android:onClick="btnClick1"
-		    android:text="@string/dirReset" />
-	-->
+	
 	</LinearLayout>
 
 </ScrollView>
