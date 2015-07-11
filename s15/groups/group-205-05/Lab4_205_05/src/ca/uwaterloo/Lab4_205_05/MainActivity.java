@@ -39,6 +39,7 @@ public class MainActivity extends Activity {
 	 PointF[] mapE2 = new PointF[3];
 	 double sTocloseS;
 	 double sTocloseE;
+	 double sCloseToeClose;
 	 String firstTurn;
 	 String secondTurn;
 	 public static TextView turnDir;
@@ -87,7 +88,7 @@ public class MainActivity extends Activity {
 					
 					endPoint = dest;
 					mv.setUserPoint(userP);
-					
+										
 					//finding the closest point to startPoint
 					if(map.calculateIntersections(startPoint, endPoint).size() != 0){
 						for( int i = 0; i<3; i++){
@@ -105,58 +106,73 @@ public class MainActivity extends Activity {
 						
 						
 						//finding the closest point to endPoint
-						for( int j = 0; j<3; j++){
-							jay = mapE2[j];						
-							double deltaX = Math.abs(jay.x - endPoint.x);
-							double deltaY = Math.abs(jay.y - endPoint.y);
-							
-							if(map.calculateIntersections(jay, endPoint).isEmpty() &&
-										Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2)) <= 1000f){
-									closestToE = jay;
-							}	
+						if(map.calculateIntersections(closestToS, endPoint).size() != 0){
+							for( int j = 0; j<3; j++){
+								jay = mapE2[j];						
+								double deltaX = Math.abs(jay.x - endPoint.x);
+								double deltaY = Math.abs(jay.y - endPoint.y);
+								
+								if(map.calculateIntersections(jay, endPoint).isEmpty() &&
+											Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2)) <= 1000f){
+										closestToE = jay;
+								}	
+							}
+							//if(closestToE == mapE2[3] && endPoint.y>closestToE.y){pathPoints.add(mapE2[2]);}
+							pathPoints.add(closestToE);
 						}
-						//if(closestToE == mapE2[3] && endPoint.y>closestToE.y){pathPoints.add(mapE2[2]);}
-						pathPoints.add(closestToE);
 						
-
+						
 						double xOf_sTcS = -(startPoint.x - closestToS.x);
 						double yOf_sTcS = -(startPoint.y - closestToS.y);
 						double xOf_eTcE = endPoint.x - closestToE.x;
 						double yOf_eTcE = endPoint.y - closestToE.y;
-						//if(closestToS != closestToE){
-/*distance btwn startpt and closestToS*/	sTocloseS = Math.sqrt(Math.pow(Math.abs(xOf_sTcS), 2) + Math.pow(Math.abs(yOf_sTcS), 2));
-/*distance btween endpt and closestToE*/	sTocloseE = Math.sqrt(Math.pow(Math.abs(xOf_eTcE), 2) + Math.pow(Math.abs(yOf_eTcE), 2)); 
+						double foo = Math.abs(closestToS.x - closestToE.x);
+						double bar = Math.abs(closestToS.y - closestToE.y);
+	/*distance btwn startpt and closestToS*/	sTocloseS = Math.sqrt(Math.pow(Math.abs(xOf_sTcS), 2) + Math.pow(Math.abs(yOf_sTcS), 2));
+	/*distance btween endpt and closestToE*/	sTocloseE = Math.sqrt(Math.pow(Math.abs(xOf_eTcE), 2) + Math.pow(Math.abs(yOf_eTcE), 2)); 
+						sCloseToeClose = Math.sqrt(Math.pow(foo, 2) + Math.pow(bar, 2));
+						
+						
 							
-							if((startPoint.x<endPoint.x && startPoint.y <= closestToS.y) || startPoint.x>endPoint.x && startPoint.y > closestToS.y){
-								firstTurn = "LEFT";
-								angle = 180-((Math.atan2((double)yOf_sTcS, (double)xOf_sTcS))*180/3.1415926);
-							}
-							else if((startPoint.x>endPoint.x && startPoint.y <= closestToS.y) || startPoint.x<endPoint.x && startPoint.y > closestToS.y){
-								firstTurn = "RIGHT";
-								angle = 180+((Math.atan2((double)yOf_sTcS, (double)xOf_sTcS))*180/3.1415926);
-								if(angle>180) angle = angle - 180;
-							}
-							
-							if((closestToE.y>endPoint.y && closestToS.x < closestToE.x) || closestToE.y<endPoint.y && closestToS.x > closestToE.x){
-								secondTurn = "LEFT";
-								angle2 = ((Math.atan2((double)yOf_eTcE, (double)xOf_eTcE))*180/3.1415926);
-								if(angle2<0) angle2 = 180 + angle2;
-							}
-							else if((closestToE.y<endPoint.y && closestToS.x < closestToE.x) || closestToE.y>endPoint.y && closestToS.x > closestToE.x){
-								secondTurn = "RIGHT";
-								angle2 = ((Math.atan2((double)-yOf_eTcE, (double)xOf_eTcE))*180/3.1415926);
-								if(angle2<0) angle2 = 180 + angle2;
-							}
-							
-					//	}
-
-						turnDir.setText("Go straight and turn " + firstTurn + " at " + String.format("%.2f", angle) 
-								+ " then go straight and turn " + secondTurn + " at " + String.format("%.2f", angle2));
+						if((startPoint.x<endPoint.x && startPoint.y <= closestToS.y) || startPoint.x>endPoint.x && startPoint.y > closestToS.y){
+							firstTurn = "LEFT";
+							angle = 180-((Math.atan2((double)yOf_sTcS, (double)xOf_sTcS))*180/3.1415926);
+						}
+						else if((startPoint.x>endPoint.x && startPoint.y <= closestToS.y) || startPoint.x<endPoint.x && startPoint.y > closestToS.y){
+							firstTurn = "RIGHT";
+							angle = 180+((Math.atan2((double)yOf_sTcS, (double)xOf_sTcS))*180/3.1415926);
+							if(angle>180) angle = angle - 180;
+						}
+						
+						if((closestToE.y>endPoint.y && closestToS.x < closestToE.x) || closestToE.y<endPoint.y && closestToS.x > closestToE.x){
+							secondTurn = "LEFT";
+							angle2 = ((Math.atan2((double)yOf_eTcE, (double)xOf_eTcE))*180/3.1415926);
+							if(angle2<0) angle2 = 180 + angle2;
+						}
+						else if((closestToE.y<endPoint.y && closestToS.x < closestToE.x) || closestToE.y>endPoint.y && closestToS.x > closestToE.x){
+							secondTurn = "RIGHT";
+							angle2 = ((Math.atan2((double)-yOf_eTcE, (double)xOf_eTcE))*180/3.1415926);
+							if(angle2<0) angle2 = 180 + angle2;
+						}
+						
+						if(closestToS != closestToE && map.calculateIntersections(closestToS, endPoint).size() != 0){
+							turnDir.setTextSize(18);
+							turnDir.setText("Go straight " + String.format("%.2f",sTocloseS) + "m \nturn " + firstTurn + " at " +
+							String.format("%.2f", angle) + "' then go straight for "+ String.format("%.2f",sCloseToeClose) + "m \nturn "
+									+ secondTurn + " at " + String.format("%.2f", angle2) + "' and walk for " + 
+									String.format("%.2f",sTocloseE) + " m");
+						}
+						else{
+							turnDir.setTextSize(18);
+							turnDir.setText("Go straight " + String.format("%.2f",sTocloseS) + "m \nturn " + firstTurn + 
+									" at " + String.format("%.2f", angle)+ "' \nwalk for " + String.format("%.2f",sTocloseE) + " m");
+						}
 					}
-//					for(int g= 0; g < interceptPoint.size();g++){
-//						Log.e("pointnns", String.valueOf(interceptPoint.get(g).getLine().end.x) + "," 
-//									+ String.valueOf(interceptPoint.get(g).getLine().end.y));
-//					}
+					else{
+						turnDir.setTextSize(18);
+						turnDir.setText("Y u so stupid! Walk straight to reach your destination");
+					}
+					
 					pathPoints.add(endPoint);
 					mv.setUserPath(pathPoints);
 				}
@@ -251,10 +267,10 @@ public class MainActivity extends Activity {
         	sensorManager.registerListener(r, rotation, SensorManager.SENSOR_DELAY_NORMAL);
         	layout.addView(rotatLabel);
         	
+        	layout.addView(mv);
+
         	turnDir.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
         	layout.addView(turnDir);
-        	
-        	layout.addView(mv);
         	
         	//layout.addView(graph);
         	valueC = (SeekBar) rootView.findViewById(R.id.seekBar1);
