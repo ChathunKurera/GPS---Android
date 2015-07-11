@@ -35,7 +35,8 @@ public class MainActivity extends Activity {
 	 static PointF startPoint, endPoint;
 	 static PointF userP;
 	 PointF closestToS, closestToE;
-	 PointF eye, jay;
+	 PointF eye, jay; 
+	 
 	 PointF[] mapE2 = new PointF[3];
 	 double sTocloseS;
 	 double sTocloseE;
@@ -76,13 +77,17 @@ public class MainActivity extends Activity {
         		
         		mv.setMap(map);
         		mv.addListener(new PositionListener(){
+        			
 					@Override
 					public void originChanged(MapView source, PointF loc) {
 						startPoint = loc; //assign a start point to be referenced within our code
+						final PointF originPt = new PointF(loc.x, loc.y);
+						//startPoint = originPt;
+						pathPoints.add(originPt);
 						userP = loc;
 						pathPoints.add(loc);
 					}
-	
+					
 					@Override
 					public void destinationChanged(MapView source, PointF dest) {
 					
@@ -132,7 +137,6 @@ public class MainActivity extends Activity {
 	/*distance btween endpt and closestToE*/	sTocloseE = Math.sqrt(Math.pow(Math.abs(xOf_eTcE), 2) + Math.pow(Math.abs(yOf_eTcE), 2)); 
 						sCloseToeClose = Math.sqrt(Math.pow(foo, 2) + Math.pow(bar, 2));
 						
-						
 							
 						if((startPoint.x<endPoint.x && startPoint.y <= closestToS.y) || startPoint.x>endPoint.x && startPoint.y > closestToS.y){
 							firstTurn = "LEFT";
@@ -148,6 +152,7 @@ public class MainActivity extends Activity {
 							secondTurn = "LEFT";
 							angle2 = ((Math.atan2((double)yOf_eTcE, (double)xOf_eTcE))*180/3.1415926);
 							if(angle2<0) angle2 = 180 + angle2;
+							//if(userP.x > closestToE.x){ userP = closestToE;}
 						}
 						else if((closestToE.y<endPoint.y && closestToS.x < closestToE.x) || closestToE.y>endPoint.y && closestToS.x > closestToE.x){
 							secondTurn = "RIGHT";
@@ -167,6 +172,11 @@ public class MainActivity extends Activity {
 							turnDir.setText("Go straight " + String.format("%.2f",sTocloseS) + "m \nturn " + firstTurn + 
 									" at " + String.format("%.2f", angle)+ "' \nwalk for " + String.format("%.2f",sTocloseE) + " m");
 						}
+//						double mmm = Math.abs(userP.x-endPoint.x);
+//						double mmmm = Math.abs(userP.y-endPoint.y);
+//						if(Math.sqrt(Math.pow(mmm, 2)+Math.pow(mmmm, 2)) >= 2){
+//		        			turnDir.setText("Voila! You arrived at your destination");
+//		        		}
 					}
 					else{
 						turnDir.setTextSize(18);
@@ -175,8 +185,8 @@ public class MainActivity extends Activity {
 					
 					pathPoints.add(endPoint);
 					mv.setUserPath(pathPoints);
-				}
-    			
+					
+				}	        		
     		});
         }
     }
