@@ -12,9 +12,6 @@ class MagnetoSensorEventListener implements SensorEventListener {
 	float x,y,z;
 	TextView output;
 	TextView stepView;
-	float maxMagx;
-	float maxMagy;
-	float maxMagz;
 	float[] geomagnetic;
 	float[] angleReading = new float[2];
 	public static double northSteps, eastSteps, netDis, netDir = 0;
@@ -75,7 +72,7 @@ class MagnetoSensorEventListener implements SensorEventListener {
 						output.setTextSize(30);
 						output.setText("North " + String.valueOf(properAngle));
 						stepView.setText("North : " + String.format("%.2f", northSteps)  + "   East : " +  String.format("%.2f", eastSteps)
-								+ "\nNet Displacement: " + String.format("%.2f", netDis) + " (" + String.format("%.2f", netDir) + ")"  + "\nError " 
+								+ "\nNet Displacement: " + String.format("%.2f", netDis) + "\nError " 
 								+ String.format("%.2f", error)+"%");
 					}
 					
