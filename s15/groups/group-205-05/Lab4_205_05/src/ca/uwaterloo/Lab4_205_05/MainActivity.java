@@ -6,6 +6,7 @@ import java.util.List;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.graphics.Color;
 import android.graphics.PointF;
 import android.hardware.Sensor;
 import android.hardware.SensorEventListener;
@@ -47,6 +48,8 @@ public class MainActivity extends Activity {
 	 double angle;
 	 double angle2;
 	 
+	 PointF originPt;
+	 
      public void onClick(View v) { }
      	public void btnClick(View V){
      		steps += 1;
@@ -80,22 +83,23 @@ public class MainActivity extends Activity {
         			
 					@Override
 					public void originChanged(MapView source, PointF loc) {
-						startPoint = loc; //assign a start point to be referenced within our code
-						final PointF originPt = new PointF(loc.x, loc.y);
-						//startPoint = originPt;
-						pathPoints.add(originPt);
-						userP = loc;
-						pathPoints.add(loc);
+						startPoint = loc; 
+						pathPoints.add(startPoint);
+						userP = new PointF(source.getOriginPoint().x, source.getOriginPoint().y);	
+					
+						
 					}
 					
 					@Override
 					public void destinationChanged(MapView source, PointF dest) {
 					
 					endPoint = dest;
-					mv.setUserPoint(userP);
-										
+					
+					mv.setUserPoint(userP);		
+					
 					//finding the closest point to startPoint
 					if(map.calculateIntersections(startPoint, endPoint).size() != 0){
+						
 						for( int i = 0; i<3; i++){
 							eye = mapE2[i];
 							double deltaX = Math.abs(eye.x - startPoint.x);
@@ -108,7 +112,6 @@ public class MainActivity extends Activity {
 						}
 						pathPoints.add(closestToS);
 						//if(closestToS == mapE2[3]){pathPoints.add(mapE2[2]);}
-						
 						
 						//finding the closest point to endPoint
 						if(map.calculateIntersections(closestToS, endPoint).size() != 0){
@@ -171,18 +174,14 @@ public class MainActivity extends Activity {
 							turnDir.setTextSize(18);
 							turnDir.setText("Go straight " + String.format("%.2f",sTocloseS) + "m \nturn " + firstTurn + 
 									" at " + String.format("%.2f", angle)+ "' \nwalk for " + String.format("%.2f",sTocloseE) + " m");
-						}
-//						double mmm = Math.abs(userP.x-endPoint.x);
-//						double mmmm = Math.abs(userP.y-endPoint.y);
-//						if(Math.sqrt(Math.pow(mmm, 2)+Math.pow(mmmm, 2)) >= 2){
-//		        			turnDir.setText("Voila! You arrived at your destination");
-//		        		}
+						}						
 					}
 					else{
 						turnDir.setTextSize(18);
 						turnDir.setText("Y u so stupid! Walk straight to reach your destination");
 					}
 					
+					turnDir.setTextColor(Color.BLUE);
 					pathPoints.add(endPoint);
 					mv.setUserPath(pathPoints);
 					
@@ -191,8 +190,6 @@ public class MainActivity extends Activity {
         }
     }
 
-	
-	
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo){
 		super.onCreateContextMenu(menu, v, menuInfo);
