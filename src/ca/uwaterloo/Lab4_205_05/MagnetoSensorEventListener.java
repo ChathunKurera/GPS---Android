@@ -1,5 +1,6 @@
 package ca.uwaterloo.Lab4_205_05;
 
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -52,16 +53,23 @@ class MagnetoSensorEventListener implements SensorEventListener {
 						else{
 							properAngle = 360 - angle;
 						}
-						
+						  
 						if(AccelerometerSensorEventListener.stepTrue){
 							northSteps += 0.8*Math.cos((properAngle*3.1415926f/180));
 							eastSteps += 0.8*Math.sin((properAngle*3.1415926f/180));
 
 							if(MainActivity.startPoint != null){
-								addedXdirection = (double) 0.8*Math.sin(angleReading[0]);
-								addedYdirection = (double) 0.8*Math.cos(angleReading[0]);
+								addedXdirection = (double) 1*Math.sin(Math.PI - angleReading[0]);
+								addedYdirection = (double) 1*Math.cos(Math.PI - angleReading[0]);
 								updateUserPoint(addedXdirection, addedYdirection);
 								MainActivity.mv.setUserPoint(MainActivity.userP);								
+							}
+							
+							double mmm = Math.abs(MainActivity.userP.x-MainActivity.endPoint.x);
+							double mmmm = Math.abs(MainActivity.userP.y-MainActivity.endPoint.y);
+							if(Math.sqrt(Math.pow(mmm, 2)+Math.pow(mmmm, 2)) < 1){
+								MainActivity.turnDir.setText(null);
+								MainActivity.turnDir.setText("Voila! You arrived at your destination");
 							}
 							
 							AccelerometerSensorEventListener.stepTrue = false;							
@@ -70,6 +78,7 @@ class MagnetoSensorEventListener implements SensorEventListener {
 						error = netDis/MainActivity.steps *100;
 						
 						output.setTextSize(30);
+						output.setTextColor(Color.RED);
 						output.setText("North " + String.valueOf(properAngle));
 						stepView.setText("North : " + String.format("%.2f", northSteps)  + "   East : " +  String.format("%.2f", eastSteps)
 								+ "\nNet Displacement: " + String.format("%.2f", netDis) + "\nError " 
