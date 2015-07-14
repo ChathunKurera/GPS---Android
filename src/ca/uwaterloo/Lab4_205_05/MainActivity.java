@@ -82,19 +82,16 @@ public class MainActivity extends Activity {
         		mv.addListener(new PositionListener(){
         			
 					@Override
-					public void originChanged(MapView source, PointF loc) {
+/*  -------   */  public void originChanged(MapView source, PointF loc) {
 						startPoint = loc; 
 						pathPoints.add(startPoint);
 						userP = new PointF(source.getOriginPoint().x, source.getOriginPoint().y);	
 					
-						
 					}
 					
 					@Override
 					public void destinationChanged(MapView source, PointF dest) {
-					
 					endPoint = dest;
-					
 					mv.setUserPoint(userP);		
 					
 					//finding the closest point to startPoint
@@ -155,7 +152,6 @@ public class MainActivity extends Activity {
 							secondTurn = "LEFT";
 							angle2 = ((Math.atan2((double)yOf_eTcE, (double)xOf_eTcE))*180/3.1415926);
 							if(angle2<0) angle2 = 180 + angle2;
-							//if(userP.x > closestToE.x){ userP = closestToE;}
 						}
 						else if((closestToE.y<endPoint.y && closestToS.x < closestToE.x) || closestToE.y>endPoint.y && closestToS.x > closestToE.x){
 							secondTurn = "RIGHT";
@@ -178,7 +174,7 @@ public class MainActivity extends Activity {
 					}
 					else{
 						turnDir.setTextSize(18);
-						turnDir.setText("Y u so stupid! Walk straight to reach your destination");
+						turnDir.setText("Walk straight to reach your destination");
 					}
 					
 					turnDir.setTextColor(Color.BLUE);
@@ -237,6 +233,7 @@ public class MainActivity extends Activity {
     public static class PlaceholderFragment extends Fragment {
     	private SeekBar valueC;
     	SensorEventListener a;
+    	
         public PlaceholderFragment(){        	
         }
                 
