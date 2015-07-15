@@ -33,21 +33,24 @@ public class MainActivity extends Activity {
 	 public static float[] gravity;
 	 List<PointF> pathPoints = new ArrayList<PointF>();
 	 List<InterceptPoint> interceptPoint = new ArrayList<InterceptPoint>(); 
+	 List<PointF> userPathPts = new ArrayList<PointF>();
 	 static PointF startPoint, endPoint;
 	 static PointF userP;
-	 PointF closestToS, closestToE;
+	 PointF closestToS;
+	 PointF closestToE = new PointF(0.0f, 0.0f);
 	 PointF eye, jay; 
-	 
+//	 PointF nextToUser;
 	 PointF[] mapE2 = new PointF[3];
 	 double sTocloseS;
 	 double sTocloseE;
-	 double sCloseToeClose;
+	 double sCloseToeClose, sToeDist;
 	 String firstTurn;
 	 String secondTurn;
 	 public static TextView turnDir;
 	 double angle;
 	 double angle2;
-	 
+
+	 static	PointF nextToUser;
 	 PointF originPt;
 	 
      public void onClick(View v) { }
@@ -82,18 +85,24 @@ public class MainActivity extends Activity {
         		mv.addListener(new PositionListener(){
         			
 					@Override
-/*  -------   */  public void originChanged(MapView source, PointF loc) {
+/*  -------   */    public void originChanged(MapView source, PointF loc) {
 						startPoint = loc; 
 						pathPoints.add(startPoint);
 						userP = new PointF(source.getOriginPoint().x, source.getOriginPoint().y);	
-					
+						
+					    nextToUser = new PointF((float) (userP.x + 
+					    		Math.sin(Math.PI - MagnetoSensorEventListener.angleReading[0] - 0.349)), (float) (userP.y +
+					    		Math.cos(Math.PI - MagnetoSensorEventListener.angleReading[0] - 0.349)));
+					  
+						
 					}
 					
 					@Override
-					public void destinationChanged(MapView source, PointF dest) {
+/*  -------   */ 	public void destinationChanged(MapView source, PointF dest) {
 					endPoint = dest;
-					mv.setUserPoint(userP);		
-					
+					mv.setUserPoint(userP);	
+							
+					 
 					//finding the closest point to startPoint
 					if(map.calculateIntersections(startPoint, endPoint).size() != 0){
 						
@@ -118,14 +127,16 @@ public class MainActivity extends Activity {
 								double deltaY = Math.abs(jay.y - endPoint.y);
 								
 								if(map.calculateIntersections(jay, endPoint).isEmpty() &&
-											Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2)) <= 1000f){
+											Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2)) <= 50f){
 										closestToE = jay;
 								}	
 							}
 							//if(closestToE == mapE2[3] && endPoint.y>closestToE.y){pathPoints.add(mapE2[2]);}
 							pathPoints.add(closestToE);
 						}
-						
+						else{
+							closestToE = closestToS;
+						}
 						
 						double xOf_sTcS = -(startPoint.x - closestToS.x);
 						double yOf_sTcS = -(startPoint.y - closestToS.y);
@@ -133,9 +144,12 @@ public class MainActivity extends Activity {
 						double yOf_eTcE = endPoint.y - closestToE.y;
 						double foo = Math.abs(closestToS.x - closestToE.x);
 						double bar = Math.abs(closestToS.y - closestToE.y);
-	/*distance btwn startpt and closestToS*/	sTocloseS = Math.sqrt(Math.pow(Math.abs(xOf_sTcS), 2) + Math.pow(Math.abs(yOf_sTcS), 2));
-	/*distance btween endpt and closestToE*/	sTocloseE = Math.sqrt(Math.pow(Math.abs(xOf_eTcE), 2) + Math.pow(Math.abs(yOf_eTcE), 2)); 
-						sCloseToeClose = Math.sqrt(Math.pow(foo, 2) + Math.pow(bar, 2));
+						double far = Math.abs(startPoint.x - endPoint.x);
+						double raf = Math.abs(startPoint.y - endPoint.y);
+	/*distance btwn startpt and closestToS*/	sTocloseS = ((Math.sqrt(Math.pow(Math.abs(xOf_sTcS), 2) + Math.pow(Math.abs(yOf_sTcS), 2)))/MagnetoSensorEventListener.stepSize);
+	/*distance btween endpt and closestToE*/	sTocloseE = ((Math.sqrt(Math.pow(Math.abs(xOf_eTcE), 2) + Math.pow(Math.abs(yOf_eTcE), 2)))/MagnetoSensorEventListener.stepSize); 
+						sCloseToeClose = ((Math.sqrt(Math.pow(foo, 2) + Math.pow(bar, 2)))/MagnetoSensorEventListener.stepSize);
+						sToeDist = ((Math.sqrt(Math.pow(far, 2) + Math.pow(raf, 2)))/MagnetoSensorEventListener.stepSize);
 						
 							
 						if((startPoint.x<endPoint.x && startPoint.y <= closestToS.y) || startPoint.x>endPoint.x && startPoint.y > closestToS.y){
@@ -161,26 +175,29 @@ public class MainActivity extends Activity {
 						
 						if(closestToS != closestToE && map.calculateIntersections(closestToS, endPoint).size() != 0){
 							turnDir.setTextSize(18);
-							turnDir.setText("Go straight " + String.format("%.2f",sTocloseS) + "m \nturn " + firstTurn + " at " +
-							String.format("%.2f", angle) + "' then go straight for "+ String.format("%.2f",sCloseToeClose) + "m \nturn "
+							turnDir.setText("Go straight " + String.format("%.2f",sTocloseS) + " steps \nturn " + firstTurn + " at " +
+							String.format("%.2f", angle) + "' then go straight for "+ String.format("%.2f",sCloseToeClose) + " steps \nturn "
 									+ secondTurn + " at " + String.format("%.2f", angle2) + "' and walk for " + 
-									String.format("%.2f",sTocloseE) + " m");
+									String.format("%.2f",sTocloseE) + " steps");
 						}
 						else{
 							turnDir.setTextSize(18);
-							turnDir.setText("Go straight " + String.format("%.2f",sTocloseS) + "m \nturn " + firstTurn + 
-									" at " + String.format("%.2f", angle)+ "' \nwalk for " + String.format("%.2f",sTocloseE) + " m");
+							turnDir.setText("Go straight " + String.format("%.2f",sTocloseS) + " steps \nturn " + firstTurn + 
+									" at " + String.format("%.2f", angle)+ "' \nwalk for " + String.format("%.2f",sTocloseE) + " steps");
 						}						
 					}
 					else{
 						turnDir.setTextSize(18);
-						turnDir.setText("Walk straight to reach your destination");
+						turnDir.setText("Walk straight to reach your destination " + String.format("%.2f",sToeDist) + " steps");
 					}
 					
 					turnDir.setTextColor(Color.BLUE);
 					pathPoints.add(endPoint);
 					mv.setUserPath(pathPoints);
-					
+					userPathPts.add(userP);
+					userPathPts.add(nextToUser);
+					mv.setUuPath(userPathPts);
+					userPathPts.clear();
 				}	        		
     		});
         }
@@ -219,6 +236,7 @@ public class MainActivity extends Activity {
         }
         if (id == R.id.item3) {
         	pathPoints.clear(); 
+        	mv.setUserPath(pathPoints);
      		interceptPoint.clear();
      		startPoint = null;
      		endPoint = null;

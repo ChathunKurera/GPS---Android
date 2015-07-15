@@ -57,6 +57,8 @@ public class MapView extends View
     
     private List<PointF> userPath = new ArrayList<PointF>();
     
+    private List<PointF> setUPath = new ArrayList<PointF>();/////////////////
+    
     private int SET_LOCATION_ID = 0;
     private int SET_DESTINATION_ID = 1;
     
@@ -198,6 +200,16 @@ public class MapView extends View
         invalidate();
     }
     
+    public void setUuPath(List<PointF> points)
+    {
+    	setUPath.clear();
+        
+        if(points != null)
+        	setUPath.addAll(points);
+        
+        invalidate();
+    }
+    
     /**
      * Adds a labelled point. These are a series of points that are drawn with the indicated labels.
      * @param point The point's location (in meters). Values are copied.
@@ -269,6 +281,13 @@ public class MapView extends View
             PointF p = lp.getPoint(); 
             canvas.drawCircle(p.x * scale.x, p.y * scale.y, 4, linePaints.get(LABELlED_POINT_COLOR_INDEX));
             canvas.drawText(lp.getLabel(), 2 + p.x * scale.x, p.y * scale.y, linePaints.get(LINE_COLOR_INDEX));
+        }
+        
+        //////////////
+        for(int i = 0; i < setUPath.size() - 1; i++){
+            canvas.drawLine(setUPath.get(i).x * scale.x, setUPath.get(i).y * scale.y, 
+                            setUPath.get(i+1).x * scale.x, setUPath.get(i+1).y * scale.y, 
+                            linePaints.get(USER_PATH_COLOR_INDEX));
         }
         
         canvas.drawCircle(startPoint.x * scale.x, startPoint.y * scale.y, 10, linePaints.get(START_POINT_COLOR_INDEX));
