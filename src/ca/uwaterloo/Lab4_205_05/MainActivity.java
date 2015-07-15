@@ -33,7 +33,6 @@ public class MainActivity extends Activity {
 	 public static float[] gravity;
 	 List<PointF> pathPoints = new ArrayList<PointF>();
 	 List<InterceptPoint> interceptPoint = new ArrayList<InterceptPoint>(); 
-	 List<PointF> userPathPts = new ArrayList<PointF>();
 	 static PointF startPoint, endPoint;
 	 static PointF userP;
 	 PointF closestToS;
@@ -84,17 +83,13 @@ public class MainActivity extends Activity {
         		mv.setMap(map);
         		mv.addListener(new PositionListener(){
         			
-					@Override
-/*  -------   */    public void originChanged(MapView source, PointF loc) {
+        			@Override
+/*  -------   */	public void originChanged(MapView source, PointF loc) {
 						startPoint = loc; 
 						pathPoints.add(startPoint);
 						userP = new PointF(source.getOriginPoint().x, source.getOriginPoint().y);	
 						
-					    nextToUser = new PointF((float) (userP.x + 
-					    		Math.sin(Math.PI - MagnetoSensorEventListener.angleReading[0] - 0.349)), (float) (userP.y +
-					    		Math.cos(Math.PI - MagnetoSensorEventListener.angleReading[0] - 0.349)));
-					  
-						
+					    
 					}
 					
 					@Override
@@ -194,10 +189,7 @@ public class MainActivity extends Activity {
 					turnDir.setTextColor(Color.BLUE);
 					pathPoints.add(endPoint);
 					mv.setUserPath(pathPoints);
-					userPathPts.add(userP);
-					userPathPts.add(nextToUser);
-					mv.setUuPath(userPathPts);
-					userPathPts.clear();
+					
 				}	        		
     		});
         }
@@ -237,8 +229,8 @@ public class MainActivity extends Activity {
         if (id == R.id.item3) {
         	pathPoints.clear(); 
         	mv.setUserPath(pathPoints);
+        	mv.removeAllLabeledPoints();
      		interceptPoint.clear();
-     		startPoint = null;
      		endPoint = null;
         	Toast.makeText(this, "GPS path cleared", Toast.LENGTH_SHORT).show();
         }
