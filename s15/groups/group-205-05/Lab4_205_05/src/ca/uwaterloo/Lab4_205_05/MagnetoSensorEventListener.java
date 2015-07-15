@@ -1,11 +1,17 @@
 package ca.uwaterloo.Lab4_205_05;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.graphics.Color;
+import android.graphics.PointF;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.widget.TextView;
+
+
 
 class MagnetoSensorEventListener implements SensorEventListener {
 	public static double angle = 0;
@@ -15,7 +21,9 @@ class MagnetoSensorEventListener implements SensorEventListener {
 	TextView stepView;
 	float[] geomagnetic;
 	static float[] angleReading = new float[2];
-	
+
+
+	 List<PointF> userPathPts = new ArrayList<PointF>();
 	public static double northSteps, eastSteps, netDis, netDir = 0;
 	double error;
 	static double addedXdirection;
@@ -31,7 +39,7 @@ class MagnetoSensorEventListener implements SensorEventListener {
 		
 		public void onSensorChanged(SensorEvent se){
 			if (se.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD){
-							
+			//				Sensor.TYPE_ORIENTATION
 				x = se.values[0];
 				y = se.values[1];
 				z = se.values[2];
@@ -55,6 +63,8 @@ class MagnetoSensorEventListener implements SensorEventListener {
 						else{
 							properAngle = 360 - angle;
 						}
+						
+						
 						  
 						if(AccelerometerSensorEventListener.stepTrue){
 							northSteps += Math.cos((properAngle*3.1415926f/180));
@@ -66,6 +76,16 @@ class MagnetoSensorEventListener implements SensorEventListener {
 								updateUserPoint(addedXdirection, addedYdirection);
 								MainActivity.mv.setUserPoint(MainActivity.userP);								
 							}
+							
+							MainActivity.nextToUser = new PointF((float) (MainActivity.userP.x + 
+						    		Math.sin(Math.PI - MagnetoSensorEventListener.angleReading[0])), (float) (MainActivity.userP.y +
+						    		Math.cos(Math.PI - MagnetoSensorEventListener.angleReading[0])));
+						    userPathPts.add(MainActivity.userP);
+							userPathPts.add(MainActivity.nextToUser);
+							MainActivity.mv.setUuPath(userPathPts);
+							MainActivity.mv.removeLabeledPoint(MainActivity.nextToUser);
+							userPathPts.remove(MainActivity.nextToUser);
+							userPathPts.clear();
 							
 							double mmm = Math.abs(MainActivity.userP.x-MainActivity.endPoint.x);
 							double mmmm = Math.abs(MainActivity.userP.y-MainActivity.endPoint.y);
