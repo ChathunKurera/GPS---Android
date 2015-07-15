@@ -8,17 +8,19 @@ import android.hardware.SensorManager;
 import android.widget.TextView;
 
 class MagnetoSensorEventListener implements SensorEventListener {
-	public static double angle = 0.00;
+	public static double angle = 0;
 	
 	float x,y,z;
 	TextView output;
 	TextView stepView;
 	float[] geomagnetic;
-	float[] angleReading = new float[2];
+	static float[] angleReading = new float[2];
+	
 	public static double northSteps, eastSteps, netDis, netDir = 0;
 	double error;
-	double addedXdirection;
-	double addedYdirection;
+	static double addedXdirection;
+	static double addedYdirection;
+	static double stepSize = 1.52;
 	
 	public MagnetoSensorEventListener(TextView outputText, TextView stepsInNE){
 		output = outputText;
@@ -55,25 +57,26 @@ class MagnetoSensorEventListener implements SensorEventListener {
 						}
 						  
 						if(AccelerometerSensorEventListener.stepTrue){
-							northSteps += 0.8*Math.cos((properAngle*3.1415926f/180));
-							eastSteps += 0.8*Math.sin((properAngle*3.1415926f/180));
+							northSteps += Math.cos((properAngle*3.1415926f/180));
+							eastSteps += Math.sin((properAngle*3.1415926f/180));
 
 							if(MainActivity.startPoint != null){
-								addedXdirection = (double) 1*Math.sin(Math.PI - angleReading[0]);
-								addedYdirection = (double) 1*Math.cos(Math.PI - angleReading[0]);
+								addedXdirection = (double) stepSize*Math.sin(Math.PI - angleReading[0] - 0.349);
+								addedYdirection = (double) stepSize*Math.cos(Math.PI - angleReading[0] - 0.349);
 								updateUserPoint(addedXdirection, addedYdirection);
 								MainActivity.mv.setUserPoint(MainActivity.userP);								
 							}
 							
 							double mmm = Math.abs(MainActivity.userP.x-MainActivity.endPoint.x);
 							double mmmm = Math.abs(MainActivity.userP.y-MainActivity.endPoint.y);
-							if(Math.sqrt(Math.pow(mmm, 2)+Math.pow(mmmm, 2)) < 1){
+							if(Math.sqrt(Math.pow(mmm, 2)+Math.pow(mmmm, 2)) < 1.7){
 								MainActivity.turnDir.setText(null);
 								MainActivity.turnDir.setText("Voila! You arrived at your destination");
 							}
 							
 							AccelerometerSensorEventListener.stepTrue = false;							
 						}	 		
+						
 						netDis = Math.sqrt(Math.pow(northSteps, 2)+ Math.pow(eastSteps, 2));
 						error = netDis/MainActivity.steps *100;
 						
@@ -83,16 +86,19 @@ class MagnetoSensorEventListener implements SensorEventListener {
 						stepView.setText("North : " + String.format("%.2f", northSteps)  + "   East : " +  String.format("%.2f", eastSteps)
 								+ "\nNet Displacement: " + String.format("%.2f", netDis) + "\nError " 
 								+ String.format("%.2f", error)+"%");
+						
 					}
-					
-					
+
 					
 				}
 			}
+			
+			
 		}
 		
 		public static void updateUserPoint(double addedX, double addedY){
 			MainActivity.userP.x = (float) addedX + MainActivity.userP.x;
 			MainActivity.userP.y = (float) addedY + MainActivity.userP.y;
 	    }
+		
 }
