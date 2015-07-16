@@ -21,25 +21,28 @@ class MagnetoSensorEventListener implements SensorEventListener {
 	TextView stepView;
 	float[] geomagnetic;
 	static float[] angleReading = new float[2];
-
-
-	 List<PointF> userPathPts = new ArrayList<PointF>();
+	List<PointF> userPathPts = new ArrayList<PointF>();
 	public static double northSteps, eastSteps, netDis, netDir = 0;
 	double error;
 	static double addedXdirection;
 	static double addedYdirection;
-	static double stepSize = 1.52;
+	static double stepSize = 1.5;
+	MapView mv;
+	PositionListener pl;
 	
-	public MagnetoSensorEventListener(TextView outputText, TextView stepsInNE){
+	public MagnetoSensorEventListener(TextView outputText, TextView stepsInNE, MapView mv, PositionListener pl){
 		output = outputText;
 		stepView = stepsInNE;
+		this.pl = pl;
+		this.mv = mv;
+		
 	}
 	
 		public void onAccuracyChanged(Sensor s, int i){}
 		
 		public void onSensorChanged(SensorEvent se){
 			if (se.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD){
-			//				Sensor.TYPE_ORIENTATION
+
 				x = se.values[0];
 				y = se.values[1];
 				z = se.values[2];
@@ -63,29 +66,43 @@ class MagnetoSensorEventListener implements SensorEventListener {
 						else{
 							properAngle = 360 - angle;
 						}
-						
-						
 						  
 						if(AccelerometerSensorEventListener.stepTrue){
 							northSteps += Math.cos((properAngle*3.1415926f/180));
 							eastSteps += Math.sin((properAngle*3.1415926f/180));
 
 							if(MainActivity.startPoint != null){
-								addedXdirection = (double) stepSize*Math.sin(Math.PI - angleReading[0] - 0.349);
-								addedYdirection = (double) stepSize*Math.cos(Math.PI - angleReading[0] - 0.349);
-								updateUserPoint(addedXdirection, addedYdirection);
-								MainActivity.mv.setUserPoint(MainActivity.userP);								
+								addedXdirection = (double) stepSize*Math.sin(Math.PI - angleReading[0] - 0.33);
+								addedYdirection = (double) stepSize*Math.cos(Math.PI - angleReading[0] - 0.30);
+								updateUserPoint(addedXdirection, addedYdirection);								
+								MainActivity.mv.setUserPoint(MainActivity.userP);	
+								
 							}
+
+							
 							
 							MainActivity.nextToUser = new PointF((float) (MainActivity.userP.x + 
-						    		Math.sin(Math.PI - MagnetoSensorEventListener.angleReading[0])), (float) (MainActivity.userP.y +
-						    		Math.cos(Math.PI - MagnetoSensorEventListener.angleReading[0])));
+						    		Math.sin(Math.PI - MagnetoSensorEventListener.angleReading[0] - 0.289)), (float) (MainActivity.userP.y +
+						    		Math.cos(Math.PI - MagnetoSensorEventListener.angleReading[0] - 0.349)));
+							
 						    userPathPts.add(MainActivity.userP);
 							userPathPts.add(MainActivity.nextToUser);
 							MainActivity.mv.setUuPath(userPathPts);
 							MainActivity.mv.removeLabeledPoint(MainActivity.nextToUser);
 							userPathPts.remove(MainActivity.nextToUser);
 							userPathPts.clear();
+							
+
+							MainActivity.pathPoints.add(MainActivity.userP);
+
+							MainActivity.mv.setUserPath(MainActivity.pathPoints);
+							
+							pl.destinationChanged(mv, MainActivity.endPoint);
+							MainActivity.pathPoints.clear();	
+							//MainActivity.pathPoints.remove(MainActivity.userP);
+							//MainActivity.pathPoints.remove(MainActivity.closestToS);
+							//MainActivity.pathPoints.remove(MainActivity.endPoint);
+							//MainActivity.pathPoints.remove(MainActivity.closestToE);
 							
 							double mmm = Math.abs(MainActivity.userP.x-MainActivity.endPoint.x);
 							double mmmm = Math.abs(MainActivity.userP.y-MainActivity.endPoint.y);
@@ -94,8 +111,9 @@ class MagnetoSensorEventListener implements SensorEventListener {
 								MainActivity.turnDir.setText("Voila! You arrived at your destination");
 							}
 							
-							AccelerometerSensorEventListener.stepTrue = false;							
-						}	 		
+							
+							AccelerometerSensorEventListener.stepTrue = false;	
+						}							
 						
 						netDis = Math.sqrt(Math.pow(northSteps, 2)+ Math.pow(eastSteps, 2));
 						error = netDis/MainActivity.steps *100;
@@ -108,17 +126,18 @@ class MagnetoSensorEventListener implements SensorEventListener {
 								+ String.format("%.2f", error)+"%");
 						
 					}
-
-					
 				}
+				
 			}
-			
-			
 		}
 		
+		
+		
 		public static void updateUserPoint(double addedX, double addedY){
+			//if(MainActivity.map.calculateIntersections(MainActivity.userP, MainActivity.nextToUser).size() == 0){
 			MainActivity.userP.x = (float) addedX + MainActivity.userP.x;
 			MainActivity.userP.y = (float) addedY + MainActivity.userP.y;
+			
 	    }
 		
 }
