@@ -7,3 +7,5 @@ Made as an extension to the pedemeter android app (https://github.com/ychathun/P
 ###Currently, the GPS supports maps in .svg format only!
 
 Buttons were added to both clear the current navigation and clear users location
+
+>To be clear, this app does not use GPS on the android device. It instead uses the accelerometer and magnetometer.
